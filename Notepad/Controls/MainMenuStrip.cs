@@ -9,9 +9,10 @@ namespace Notepad.Controls
 {
     class MainMenuStrip : MenuStrip
     {
+        private const string NAME = "MainMenuStrip";
         public MainMenuStrip()
         {
-            Name = "MainMenuStrip"; // sert a identifier le menu pour y faire reference dans d'autre classe.
+            Name = NAME; // sert a identifier le menu pour y faire reference dans d'autre classe.
             Dock = DockStyle.Top;   // Sert a ancrer le control. Au top dans ce cas la.
 
             FileDropDownMenu();
