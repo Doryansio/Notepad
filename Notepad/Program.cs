@@ -6,8 +6,9 @@ using System.Windows.Forms;
 
 namespace Notepad
 {
-    internal static class Program
+    static class Program
     {
+        public static MainForm MainForm;
         /// <summary>
         /// Point d'entrée principal de l'application.
         /// </summary>
@@ -16,7 +17,9 @@ namespace Notepad
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainForm());
+            
+            MainForm = new MainForm();
+            Application.Run(MainForm);
         }
     }
 }

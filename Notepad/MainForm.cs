@@ -13,14 +13,15 @@ namespace Notepad
 {
     public partial class MainForm : Form
     {
+        public static RichTextBox RichTextBox;
         public MainForm()
         {
             InitializeComponent();
             var menuStrip = new MainMenuStrip();
             var mainTabControl = new MainTabControl();
-            var richTextBox = new CustomRichTextBox();
+            RichTextBox = new CustomRichTextBox();
             mainTabControl.TabPages.Add("Onglet 1");
-            mainTabControl.TabPages[0].Controls.Add(richTextBox);
+            mainTabControl.TabPages[0].Controls.Add(RichTextBox);
 
             Controls.AddRange(new Control[] {mainTabControl, menuStrip });
         }

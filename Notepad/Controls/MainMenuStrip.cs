@@ -10,10 +10,13 @@ namespace Notepad.Controls
     class MainMenuStrip : MenuStrip
     {
         private const string NAME = "MainMenuStrip";
+        private FontDialog _fontDialog;
         public MainMenuStrip()
         {
             Name = NAME; // sert a identifier le menu pour y faire reference dans d'autre classe.
             Dock = DockStyle.Top;   // Sert a ancrer le control. Au top dans ce cas la.
+
+            _fontDialog = new FontDialog();
 
             FileDropDownMenu();
             EditDropDownMenu();
@@ -41,49 +44,95 @@ namespace Notepad.Controls
 
         public void EditDropDownMenu()
         {
-            var EditDropDownMenu = new ToolStripMenuItem("Edition");
+            var EditDropDown = new ToolStripMenuItem("Edition");
 
-            var CancelMenu = new ToolStripMenuItem("Annuler", null, null, Keys.Control | Keys.Z);
-            var RestoreMenu = new ToolStripMenuItem("Restaurer", null, null, Keys.Control | Keys.Y);
+            var Cancel = new ToolStripMenuItem("Annuler", null, null, Keys.Control | Keys.Z);
+            var Restore = new ToolStripMenuItem("Restaurer", null, null, Keys.Control | Keys.Y);
 
-            EditDropDownMenu.DropDownItems.AddRange(new ToolStripItem[] { CancelMenu, RestoreMenu });
+            Cancel.Click += (s, e) => { if (MainForm.RichTextBox.CanUndo) MainForm.RichTextBox.Undo(); };
+            Restore.Click += (s, e) => { if (MainForm.RichTextBox.CanRedo) MainForm.RichTextBox.Redo(); };
 
-            Items.Add(EditDropDownMenu);
+            EditDropDown.DropDownItems.AddRange(new ToolStripItem[] { Cancel, Restore });
+
+            Items.Add(EditDropDown);
+        }
+
+        private void Cancel_Click(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         public void FormatDropDownMenu()
         {
-            var FormatDropDownMenu = new ToolStripMenuItem("Format");
+            var FormatDropDown = new ToolStripMenuItem("Format");
 
-            var FontMenu = new ToolStripMenuItem("Police...");
-            
+            var Font = new ToolStripMenuItem("Police...");
 
-            FormatDropDownMenu.DropDownItems.AddRange(new ToolStripItem[] { FontMenu});
+            Font.Click += (s, e) => 
+            {
+                _fontDialog.Font = MainForm.RichTextBox.Font;
+                _fontDialog.ShowDialog();
 
-            Items.Add(FormatDropDownMenu);
+                MainForm.RichTextBox.Font = _fontDialog.Font;
+            };
+
+            FormatDropDown.DropDownItems.AddRange(new ToolStripItem[] { Font});
+
+            Items.Add(FormatDropDown);
         }
 
         public void ViewDropDownMenu()
         {
-            var ViewDropDownMenu = new ToolStripMenuItem("Affichage");
-
+            var ViewDropDown = new ToolStripMenuItem("Affichage");
             var AlwaysOnTop = new ToolStripMenuItem("Toujours devant");
-
-            var ZoomDropDownMenu = new ToolStripMenuItem("Zoom");
-
-            var ZoomInMenu = new ToolStripMenuItem("Zoom avant", null, null, Keys.Control | Keys.Add);
-            var ZoomOutMenu = new ToolStripMenuItem("Zoom arriere", null, null, Keys.Control | Keys.Subtract);
+            
+            var ZoomDropDown = new ToolStripMenuItem("Zoom");
+            var ZoomIn = new ToolStripMenuItem("Zoom avant", null, null, Keys.Control | Keys.Add);
+            var ZoomOut = new ToolStripMenuItem("Zoom arriere", null, null, Keys.Control | Keys.Subtract);
             var ZoomReset = new ToolStripMenuItem("Restaurer le zoom par defaut", null, null, Keys.Control | Keys.Divide);
 
             //ShortcutKeyDisplayString permet de changer le string du racourci
-            ZoomInMenu.ShortcutKeyDisplayString = "Ctrl+Num + ";
-            ZoomOutMenu.ShortcutKeyDisplayString = "Ctrl+Num -";
+            ZoomIn.ShortcutKeyDisplayString = "Ctrl+Num + ";
+            ZoomOut.ShortcutKeyDisplayString = "Ctrl+Num -";
             ZoomReset.ShortcutKeyDisplayString = "Ctrl+Num /";
 
-            ZoomDropDownMenu.DropDownItems.AddRange(new ToolStripItem[] {ZoomInMenu, ZoomOutMenu, ZoomReset});
-            ViewDropDownMenu.DropDownItems.AddRange(new ToolStripItem[] { AlwaysOnTop, ZoomDropDownMenu});
+            AlwaysOnTop.Click += (s, e) =>
+            {
+                
+                if (AlwaysOnTop.Checked)
+                {
+                    AlwaysOnTop.Checked = false;
+                    Program.MainForm.TopMost = false;
+                }
+                else
+                {
+                    AlwaysOnTop.Checked = true;
+                    Program.MainForm.TopMost = true;
+                }
+            };
 
-            Items.Add(ViewDropDownMenu);
+            ZoomIn.Click += (s, e) => 
+            {
+                if (MainForm.RichTextBox.ZoomFactor < 3F) 
+                {
+                    MainForm.RichTextBox.ZoomFactor += 0.3F;
+                }
+            };
+
+            ZoomOut.Click += (s, e) =>
+            {
+                if (MainForm.RichTextBox.ZoomFactor > 0.9F)
+                {
+                    MainForm.RichTextBox.ZoomFactor -= 0.3F;
+                }
+            };
+
+            ZoomReset.Click += (s, e) => { MainForm.RichTextBox.ZoomFactor = 1F;  };
+
+            ZoomDropDown.DropDownItems.AddRange(new ToolStripItem[] {ZoomIn, ZoomOut, ZoomReset});
+            ViewDropDown.DropDownItems.AddRange(new ToolStripItem[] { AlwaysOnTop, ZoomDropDown});
+
+            Items.Add(ViewDropDown);
         }
     }
 }
