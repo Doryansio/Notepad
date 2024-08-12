@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Notepad.Objects;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,9 +11,12 @@ namespace Notepad.Controls
     class MainMenuStrip : MenuStrip
     {
         private const string NAME = "MainMenuStrip";
+
         private FontDialog _fontDialog;
+        private MainForm _form;
         public MainMenuStrip()
         {
+            
             Name = NAME; // sert a identifier le menu pour y faire reference dans d'autre classe.
             Dock = DockStyle.Top;   // Sert a ancrer le control. Au top dans ce cas la.
 
@@ -22,6 +26,11 @@ namespace Notepad.Controls
             EditDropDownMenu();
             FormatDropDownMenu();
             ViewDropDownMenu();
+
+            HandleCreated += (s, e) =>
+            {
+                _form = FindForm() as MainForm;
+            };
 
         }
         public void FileDropDownMenu()
@@ -36,6 +45,25 @@ namespace Notepad.Controls
             var SaveAsMenu = new ToolStripMenuItem("Enregistrer sous...", null, null, Keys.Control | Keys.Shift | Keys.N);
             var QuitMenu = new ToolStripMenuItem("Quitter", null, null, Keys.Alt | Keys.F4);
 
+            NewMenu.Click += (s, e) =>
+            {
+                var tabControl = _form.MainTabControl;
+                var tabPagesCount = tabControl.TabPages.Count;
+                
+                var FileName = $"Sans filtre {tabPagesCount +1}";
+                var File = new TextFile(FileName);
+                var rtb = new CustomRichTextBox();
+
+                tabControl.TabPages.Add(File.SafeFileName);
+                var newTabPages = tabControl.TabPages[tabPagesCount];
+                newTabPages.Controls.Add(rtb);
+                tabControl.SelectedTab = newTabPages;
+
+                _form.Session.TextFiles.Add(File);
+                _form.CurentFile = File;
+                _form.CurrentRtb = rtb;
+            };
+
             // Ajouter les items dans le ToolStripMenu sous forme de tableau grâce a AddRange.
             FileDropDownMenu.DropDownItems.AddRange(new ToolStripItem[] { NewMenu, OpenMenu, SaveMenu, SaveAsMenu, QuitMenu });
 
@@ -49,8 +77,8 @@ namespace Notepad.Controls
             var Cancel = new ToolStripMenuItem("Annuler", null, null, Keys.Control | Keys.Z);
             var Restore = new ToolStripMenuItem("Restaurer", null, null, Keys.Control | Keys.Y);
 
-            Cancel.Click += (s, e) => { if (MainForm.RichTextBox.CanUndo) MainForm.RichTextBox.Undo(); };
-            Restore.Click += (s, e) => { if (MainForm.RichTextBox.CanRedo) MainForm.RichTextBox.Redo(); };
+            Cancel.Click += (s, e) => { if (_form.CurrentRtb.CanUndo) _form.CurrentRtb.Undo(); };
+            Restore.Click += (s, e) => { if (_form.CurrentRtb.CanRedo) _form.CurrentRtb.Redo(); };
 
             EditDropDown.DropDownItems.AddRange(new ToolStripItem[] { Cancel, Restore });
 
@@ -70,10 +98,10 @@ namespace Notepad.Controls
 
             Font.Click += (s, e) => 
             {
-                _fontDialog.Font = MainForm.RichTextBox.Font;
+                _fontDialog.Font = _form.CurrentRtb.Font;
                 _fontDialog.ShowDialog();
 
-                MainForm.RichTextBox.Font = _fontDialog.Font;
+                _form.CurrentRtb.Font = _fontDialog.Font;
             };
 
             FormatDropDown.DropDownItems.AddRange(new ToolStripItem[] { Font});
@@ -113,21 +141,21 @@ namespace Notepad.Controls
 
             ZoomIn.Click += (s, e) => 
             {
-                if (MainForm.RichTextBox.ZoomFactor < 3F) 
+                if (_form.CurrentRtb.ZoomFactor < 3F) 
                 {
-                    MainForm.RichTextBox.ZoomFactor += 0.3F;
+                    _form.CurrentRtb.ZoomFactor += 0.3F;
                 }
             };
 
             ZoomOut.Click += (s, e) =>
             {
-                if (MainForm.RichTextBox.ZoomFactor > 0.9F)
+                if (_form.CurrentRtb.ZoomFactor > 0.9F)
                 {
-                    MainForm.RichTextBox.ZoomFactor -= 0.3F;
+                    _form.CurrentRtb.ZoomFactor -= 0.3F;
                 }
             };
 
-            ZoomReset.Click += (s, e) => { MainForm.RichTextBox.ZoomFactor = 1F;  };
+            ZoomReset.Click += (s, e) => { _form.CurrentRtb.ZoomFactor = 1F;  };
 
             ZoomDropDown.DropDownItems.AddRange(new ToolStripItem[] {ZoomIn, ZoomOut, ZoomReset});
             ViewDropDown.DropDownItems.AddRange(new ToolStripItem[] { AlwaysOnTop, ZoomDropDown});
