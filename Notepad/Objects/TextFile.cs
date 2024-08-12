@@ -1,27 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
+using System.Xml.Serialization;
 
 namespace Notepad.Objects
 {
-      public class TextFile
+    public class TextFile
     {
+
+        [XmlAttribute(AttributeName = "FileName")]
         /// <summary>
         /// Chemin d'acces et nom du fichier.
         /// </summary>
         public string FileName { get; set; }
+        [XmlAttribute(AttributeName = "BackUpFileName")]
         /// <summary>
         /// Chemin d'acces et nom du fichier backup
         /// </summary>
-        public string BackUpFileName {  get; set; }
+
+        public string BackUpFileName { get; set; } = string.Empty;
+
+        [XmlIgnore()]
         /// <summary>
         /// Nom et extension du fichier. Le nom du fichier n'inclut pas le chemin d'acces.
         /// </summary>
         public string SafeFileName { get; set; }
 
+        [XmlIgnore()]
         /// <summary>
         /// Nom et extension du fichier backup. Le nom du fichier n'inclut pas le chemin d'acces.
         /// </summary>
@@ -29,7 +32,7 @@ namespace Notepad.Objects
         /// <summary>
         /// Contenu du fichier.
         /// </summary>
-        public string Content {  get; set; } = string.Empty;
+        public string Content { get; set; } = string.Empty;
         /// <summary>
         /// Constructeur de la classe TextFile
         /// </summary>

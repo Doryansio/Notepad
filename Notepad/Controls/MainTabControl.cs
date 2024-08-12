@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 
 namespace Notepad.Controls
 {
@@ -15,9 +10,8 @@ namespace Notepad.Controls
         {
             _contextMenuStrip = new TabControlContextMenuStrip();
             Name = NAME;
-            ContextMenuStrip =  _contextMenuStrip;
+            ContextMenuStrip = _contextMenuStrip;
             Dock = DockStyle.Fill;
         }
     }
 }
-    

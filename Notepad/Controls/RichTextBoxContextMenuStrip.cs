@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 
 namespace Notepad.Controls
 {
-    
+
     public class RichTextBoxContextMenuStrip : ContextMenuStrip
     {
         private RichTextBox _RichTextBox;
@@ -27,7 +22,7 @@ namespace Notepad.Controls
             Paste.Click += (s, e) => _RichTextBox.Paste();
             SelectAll.Click += (s, e) => _RichTextBox.SelectAll();
 
-            Items.AddRange(new ToolStripMenuItem[] { Cut, Copy, Paste, SelectAll});
+            Items.AddRange(new ToolStripMenuItem[] { Cut, Copy, Paste, SelectAll });
         }
     }
 }

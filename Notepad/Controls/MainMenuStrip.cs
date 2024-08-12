@@ -1,9 +1,5 @@
 ﻿using Notepad.Objects;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Notepad.Controls
@@ -16,7 +12,7 @@ namespace Notepad.Controls
         private MainForm _form;
         public MainMenuStrip()
         {
-            
+
             Name = NAME; // sert a identifier le menu pour y faire reference dans d'autre classe.
             Dock = DockStyle.Top;   // Sert a ancrer le control. Au top dans ce cas la.
 
@@ -49,8 +45,8 @@ namespace Notepad.Controls
             {
                 var tabControl = _form.MainTabControl;
                 var tabPagesCount = tabControl.TabPages.Count;
-                
-                var FileName = $"Sans filtre {tabPagesCount +1}";
+
+                var FileName = $"Sans filtre {tabPagesCount + 1}";
                 var File = new TextFile(FileName);
                 var rtb = new CustomRichTextBox();
 
@@ -60,7 +56,7 @@ namespace Notepad.Controls
                 tabControl.SelectedTab = newTabPages;
 
                 _form.Session.TextFiles.Add(File);
-                _form.CurentFile = File;
+                _form.CurrentFile = File;
                 _form.CurrentRtb = rtb;
             };
 
@@ -96,7 +92,7 @@ namespace Notepad.Controls
 
             var Font = new ToolStripMenuItem("Police...");
 
-            Font.Click += (s, e) => 
+            Font.Click += (s, e) =>
             {
                 _fontDialog.Font = _form.CurrentRtb.Font;
                 _fontDialog.ShowDialog();
@@ -104,7 +100,7 @@ namespace Notepad.Controls
                 _form.CurrentRtb.Font = _fontDialog.Font;
             };
 
-            FormatDropDown.DropDownItems.AddRange(new ToolStripItem[] { Font});
+            FormatDropDown.DropDownItems.AddRange(new ToolStripItem[] { Font });
 
             Items.Add(FormatDropDown);
         }
@@ -113,7 +109,7 @@ namespace Notepad.Controls
         {
             var ViewDropDown = new ToolStripMenuItem("Affichage");
             var AlwaysOnTop = new ToolStripMenuItem("Toujours devant");
-            
+
             var ZoomDropDown = new ToolStripMenuItem("Zoom");
             var ZoomIn = new ToolStripMenuItem("Zoom avant", null, null, Keys.Control | Keys.Add);
             var ZoomOut = new ToolStripMenuItem("Zoom arriere", null, null, Keys.Control | Keys.Subtract);
@@ -126,7 +122,7 @@ namespace Notepad.Controls
 
             AlwaysOnTop.Click += (s, e) =>
             {
-                
+
                 if (AlwaysOnTop.Checked)
                 {
                     AlwaysOnTop.Checked = false;
@@ -139,9 +135,9 @@ namespace Notepad.Controls
                 }
             };
 
-            ZoomIn.Click += (s, e) => 
+            ZoomIn.Click += (s, e) =>
             {
-                if (_form.CurrentRtb.ZoomFactor < 3F) 
+                if (_form.CurrentRtb.ZoomFactor < 3F)
                 {
                     _form.CurrentRtb.ZoomFactor += 0.3F;
                 }
@@ -155,10 +151,10 @@ namespace Notepad.Controls
                 }
             };
 
-            ZoomReset.Click += (s, e) => { _form.CurrentRtb.ZoomFactor = 1F;  };
+            ZoomReset.Click += (s, e) => { _form.CurrentRtb.ZoomFactor = 1F; };
 
-            ZoomDropDown.DropDownItems.AddRange(new ToolStripItem[] {ZoomIn, ZoomOut, ZoomReset});
-            ViewDropDown.DropDownItems.AddRange(new ToolStripItem[] { AlwaysOnTop, ZoomDropDown});
+            ZoomDropDown.DropDownItems.AddRange(new ToolStripItem[] { ZoomIn, ZoomOut, ZoomReset });
+            ViewDropDown.DropDownItems.AddRange(new ToolStripItem[] { AlwaysOnTop, ZoomDropDown });
 
             Items.Add(ViewDropDown);
         }

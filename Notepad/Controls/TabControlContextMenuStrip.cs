@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 
 namespace Notepad.Controls
 {
-    public class TabControlContextMenuStrip : ContextMenuStrip  
+    public class TabControlContextMenuStrip : ContextMenuStrip
     {
         private const string NAME = "TabControlContextMenuStrip";
         public TabControlContextMenuStrip()
@@ -19,7 +14,7 @@ namespace Notepad.Controls
             var OpenFileInExplorer = new ToolStripMenuItem("Ouvrir le repertoire du fichier en cours dans l'explorateur");
 
 
-            Items.AddRange(new ToolStripMenuItem[] {closeTab, closeAllTabsExceptThis, OpenFileInExplorer});
+            Items.AddRange(new ToolStripMenuItem[] { closeTab, closeAllTabsExceptThis, OpenFileInExplorer });
         }
     }
 }
