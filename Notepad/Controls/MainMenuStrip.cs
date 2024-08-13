@@ -1,5 +1,6 @@
 ﻿using Notepad.Objects;
 using System;
+using System.IO;
 using System.Windows.Forms;
 
 namespace Notepad.Controls
@@ -10,6 +11,7 @@ namespace Notepad.Controls
 
         private FontDialog _fontDialog;
         private MainForm _form;
+        private OpenFileDialog _openFileDialog;
         public MainMenuStrip()
         {
 
@@ -17,6 +19,7 @@ namespace Notepad.Controls
             Dock = DockStyle.Top;   // Sert a ancrer le control. Au top dans ce cas la.
 
             _fontDialog = new FontDialog();
+            _openFileDialog = new OpenFileDialog();
 
             FileDropDownMenu();
             EditDropDownMenu();
@@ -44,14 +47,14 @@ namespace Notepad.Controls
             NewMenu.Click += (s, e) =>
             {
                 var tabControl = _form.MainTabControl;
-                var tabPagesCount = tabControl.TabPages.Count;
+                var tabCount = tabControl.TabCount;
 
-                var FileName = $"Sans filtre {tabPagesCount + 1}";
+                var FileName = $"Sans filtre {tabCount + 1}";
                 var File = new TextFile(FileName);
                 var rtb = new CustomRichTextBox();
 
                 tabControl.TabPages.Add(File.SafeFileName);
-                var newTabPages = tabControl.TabPages[tabPagesCount];
+                var newTabPages = tabControl.TabPages[tabCount];
                 newTabPages.Controls.Add(rtb);
                 tabControl.SelectedTab = newTabPages;
 
@@ -60,10 +63,43 @@ namespace Notepad.Controls
                 _form.CurrentRtb = rtb;
             };
 
+            OpenMenu.Click += async (s, e) =>
+            {
+                if(_openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    var tabControl = _form.MainTabControl;
+                    var tabCount = tabControl.TabCount;
+
+                    var file = new TextFile(_openFileDialog.FileName);
+                    var rtb = new CustomRichTextBox();
+
+                    _form.Text = $"{file.FileName} - Notepad.NET";
+
+                    using (StreamReader reader = new StreamReader(file.FileName))
+                    {
+                        file.Content = await reader.ReadToEndAsync();
+                    }
+                    rtb.Text = file.Content;
+
+                    tabControl.TabPages.Add(file.SafeFileName);
+                    tabControl.TabPages[tabCount].Controls.Add(rtb);
+
+                    _form.Session.TextFiles.Add(file);
+                    _form.CurrentFile = file;
+                    _form.CurrentRtb = rtb;
+                    tabControl.SelectedTab = tabControl.TabPages[tabCount];
+                }
+            };
+
             // Ajouter les items dans le ToolStripMenu sous forme de tableau grâce a AddRange.
             FileDropDownMenu.DropDownItems.AddRange(new ToolStripItem[] { NewMenu, OpenMenu, SaveMenu, SaveAsMenu, QuitMenu });
 
             Items.Add(FileDropDownMenu);
+        }
+
+        private void OpenMenu_Click(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         public void EditDropDownMenu()

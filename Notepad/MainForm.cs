@@ -1,5 +1,6 @@
 ﻿using Notepad.Controls;
 using Notepad.Objects;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace Notepad
@@ -56,6 +57,18 @@ namespace Notepad
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             Session.Save();
+
+            foreach (var file in Session.TextFiles) 
+            {
+                var fileIndex = Session.TextFiles.IndexOf(file);
+                var rtb = MainTabControl.TabPages[fileIndex].Controls.Find("RtbtextFilecontent", true).First();
+                
+                if(file.FileName.StartsWith("Sans Titre"))
+                {
+                    file.Content = rtb.Text;
+                    Session.BackupFile(file);
+                }
+            }
         }
     }
 }
