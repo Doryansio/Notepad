@@ -1,6 +1,8 @@
 ﻿using Notepad.Objects;
+using Notepad.Services;
 using System;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace Notepad.Controls
@@ -12,6 +14,7 @@ namespace Notepad.Controls
         private FontDialog _fontDialog;
         private MainForm _form;
         private OpenFileDialog _openFileDialog;
+        private SaveFileDialog _saveFileDialog;
         public MainMenuStrip()
         {
 
@@ -20,6 +23,7 @@ namespace Notepad.Controls
 
             _fontDialog = new FontDialog();
             _openFileDialog = new OpenFileDialog();
+            _saveFileDialog = new SaveFileDialog();
 
             FileDropDownMenu();
             EditDropDownMenu();
@@ -41,7 +45,7 @@ namespace Notepad.Controls
             var NewMenu = new ToolStripMenuItem("Nouveau", null, null, Keys.Control | Keys.N);
             var OpenMenu = new ToolStripMenuItem("Ouvrir...", null, null, Keys.Control | Keys.O);
             var SaveMenu = new ToolStripMenuItem("Enregistrer", null, null, Keys.Control | Keys.S);
-            var SaveAsMenu = new ToolStripMenuItem("Enregistrer sous...", null, null, Keys.Control | Keys.Shift | Keys.N);
+            var SaveAsMenu = new ToolStripMenuItem("Enregistrer sous...", null, null, Keys.Control | Keys.Shift | Keys.S);
             var QuitMenu = new ToolStripMenuItem("Quitter", null, null, Keys.Alt | Keys.F4);
 
             NewMenu.Click += (s, e) =>
@@ -56,9 +60,11 @@ namespace Notepad.Controls
                 tabControl.TabPages.Add(File.SafeFileName);
                 var newTabPages = tabControl.TabPages[tabCount];
                 newTabPages.Controls.Add(rtb);
-                tabControl.SelectedTab = newTabPages;
 
                 _form.Session.TextFiles.Add(File);
+                tabControl.SelectedTab = newTabPages;
+
+                
                 _form.CurrentFile = File;
                 _form.CurrentRtb = rtb;
             };
@@ -89,6 +95,74 @@ namespace Notepad.Controls
                     _form.CurrentRtb = rtb;
                     tabControl.SelectedTab = tabControl.TabPages[tabCount];
                 }
+            };
+
+            SaveMenu.Click += async (s, e) => 
+            {
+                var currentFile = _form.CurrentFile;
+                var currentRtbText = _form.CurrentRtb.Text;
+
+                if (currentFile.Content != currentRtbText)
+                {
+                    if (File.Exists(currentFile.FileName))
+                    {
+                        using (StreamWriter writer = File.CreateText(currentFile.FileName))
+                        {
+                            await writer.WriteAsync(currentFile.Content);
+                        }
+                        currentFile.Content = currentRtbText;
+                        _form.Text = currentFile.FileName;
+                        _form.MainTabControl.SelectedTab.Text = currentFile.SafeFileName;
+                    }
+                    else
+                    {
+                        SaveAsMenu.PerformClick();
+                    }
+                }
+            };
+
+            SaveAsMenu.Click += async (s, e) =>
+            {
+                if (_saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    var newFileName = _saveFileDialog.FileName;
+                    var alreadyExists = false;
+
+                    foreach (var file in _form.Session.TextFiles)
+                    {
+                        if (file.FileName == newFileName)
+                        {
+                            MessageBox.Show("ce fichier est deja ouvert dans Notepad.NET", "ERREUR", MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
+                            alreadyExists = true;
+                            break;
+                        }
+                    }
+                    //si le fichier n'existe pas deja
+                    if (!alreadyExists)
+                    {
+                        var file = new TextFile(newFileName) { Content = _form.CurrentRtb.Text };
+                        var oldFile = _form.Session.TextFiles.Where(x => x.FileName == _form.CurrentFile.FileName).First();
+                        
+                        _form.Session.TextFiles.Replace(oldFile, file);
+                        
+                        using (StreamWriter writer = File.CreateText(file.FileName))
+                        {
+                            await writer.WriteAsync(file.Content); 
+                        }
+
+                        _form.MainTabControl.SelectedTab.Text = file.SafeFileName;
+                        _form.Text = file.FileName;
+                        _form.CurrentFile = file;
+                    }
+
+                    
+                }
+            };
+
+            QuitMenu.Click += (s, e) =>
+            {
+                Application.Exit();
             };
 
             // Ajouter les items dans le ToolStripMenu sous forme de tableau grâce a AddRange.

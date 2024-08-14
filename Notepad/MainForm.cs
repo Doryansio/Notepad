@@ -1,5 +1,7 @@
 ﻿using Notepad.Controls;
 using Notepad.Objects;
+using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -16,18 +18,9 @@ namespace Notepad
         {
             InitializeComponent();
             Session = new Session();
-
-
             var menuStrip = new MainMenuStrip();
             MainTabControl = new MainTabControl();
-
             CurrentRtb = new CustomRichTextBox();
-
-
-
-
-
-
             Controls.AddRange(new Control[] { MainTabControl, menuStrip });
 
             InitialiazeFile();
@@ -36,8 +29,11 @@ namespace Notepad
         /// Permet de creer un onglet a l'ouverture de l'application
         /// S'il n'y en a pas.
         /// </summary>
-        private void InitialiazeFile()
+        private async void InitialiazeFile()
         {
+            Session = await Session.Load();
+            
+
             if (Session.TextFiles.Count == 0)
             {
                 var file = new TextFile("Sans Titre 1");
@@ -52,23 +48,50 @@ namespace Notepad
                 CurrentRtb = rtb;
 
             }
+            else
+            {
+                var activeIndex = Session.ActiveIndex;
+
+
+                foreach (var file in Session.TextFiles)
+                {
+                    if(File.Exists(file.FileName) || File.Exists(file.BackUpFileName))
+                    {
+                        var rtb = new CustomRichTextBox();
+                        var tabCount = MainTabControl.TabCount;
+
+                        MainTabControl.TabPages.Add(file.SafeFileName);
+                        MainTabControl.TabPages[tabCount].Controls.Add(rtb);
+
+                        rtb.Text = file.Content;
+                        
+                    }
+                }
+                CurrentFile = Session.TextFiles[activeIndex];
+                MainTabControl.SelectedIndex = activeIndex;
+                CurrentRtb = (CustomRichTextBox)MainTabControl.TabPages[activeIndex].Controls.Find("RtbtextFilecontent", true).First();
+                
+                CurrentRtb.Select();
+            }
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+            Session.ActiveIndex = MainTabControl.SelectedIndex;
             Session.Save();
 
-            foreach (var file in Session.TextFiles) 
+            foreach (var file in Session.TextFiles)
             {
                 var fileIndex = Session.TextFiles.IndexOf(file);
                 var rtb = MainTabControl.TabPages[fileIndex].Controls.Find("RtbtextFilecontent", true).First();
-                
-                if(file.FileName.StartsWith("Sans Titre"))
+
+                if (file.FileName.StartsWith("Sans Titre"))
                 {
                     file.Content = rtb.Text;
                     Session.BackupFile(file);
                 }
             }
+            
         }
     }
 }

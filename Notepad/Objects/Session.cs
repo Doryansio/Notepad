@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -23,7 +25,7 @@ namespace Notepad.Objects
         /// <summary>
         ///  chemin d'acces et nom du fichier representant la session.
         /// </summary>
-        public string Filename { get; } = Path.Combine(_applicationPath, FILENAME);
+        public static string Filename { get; } = Path.Combine(_applicationPath, FILENAME);
 
         [XmlAttribute(AttributeName = "ActiveIndex")]
         public int ActiveIndex { get; set; } = 0;
@@ -45,7 +47,54 @@ namespace Notepad.Objects
                 Directory.CreateDirectory(_applicationPath);
             }
         }
+        public static async Task<Session> Load()
+        {
+            var session = new Session();
 
+            if (File.Exists(Filename))
+            {
+                var serializer = new XmlSerializer(typeof(Session));
+                var streamReader = new StreamReader(Filename);
+
+                try
+                {
+                    session = (Session)serializer.Deserialize(streamReader);
+
+                    foreach (var file in session.TextFiles)
+                    {
+                        var fileName = file.FileName;
+                        var backupFileName = file.BackUpFileName;
+                        file.SafeFileName = Path.GetFileName(fileName);
+
+
+                        //fichier existant sur le disque
+                        if (File.Exists(fileName))
+                        {
+                            using (StreamReader reader = new StreamReader(fileName))
+                            {
+                                file.Content = await reader.ReadToEndAsync();
+                            }
+                        }
+
+                        //fichier backup du dossier backup
+                        if (File.Exists(backupFileName))
+                        {
+                            using (StreamReader reader = new StreamReader(backupFileName))
+                            {
+                                file.Content = await reader.ReadToEndAsync();
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex) 
+                {
+                    MessageBox.Show("Une erreur s'est produite" + ex.Message);
+                    
+                }
+                streamReader.Close();
+            }
+            return session;
+        }
         public void Save()
         {
             var emptyNameSpace = new XmlSerializerNamespaces(new[] { XmlQualifiedName.Empty });
@@ -71,5 +120,6 @@ namespace Notepad.Objects
                 }
             }
         }
+
     }
 }
