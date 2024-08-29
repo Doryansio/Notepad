@@ -6,6 +6,7 @@ namespace Notepad.Controls
     public class CustomRichTextBox : RichTextBox
     {
         private const string NAME = "RtbtextFilecontent";
+        public CompteurLigne LigneCompteur;
         public CustomRichTextBox()
         {
             Name = NAME;
@@ -14,6 +15,10 @@ namespace Notepad.Controls
             Dock = DockStyle.Fill;
             BorderStyle = BorderStyle.None;
             ContextMenuStrip = new RichTextBoxContextMenuStrip(this);
+            LigneCompteur = new CompteurLigne();
+            
+            Controls.Add(LigneCompteur);
+            
         }
     }
 }

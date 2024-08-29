@@ -46,6 +46,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controls\CompteurLigne.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Controls\CustomRichTextBox.cs">
       <SubType>Component</SubType>
     </Compile>

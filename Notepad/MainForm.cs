@@ -13,6 +13,7 @@ namespace Notepad
         public TabControl MainTabControl;
         public Session Session;
         public TextFile CurrentFile;
+        
 
         public MainForm()
         {
@@ -21,7 +22,9 @@ namespace Notepad
             var menuStrip = new MainMenuStrip();
             MainTabControl = new MainTabControl();
             CurrentRtb = new CustomRichTextBox();
-            Controls.AddRange(new Control[] { MainTabControl, menuStrip });
+            
+            
+            Controls.AddRange(new Control[] { MainTabControl, menuStrip, });
 
             InitialiazeFile();
         }
@@ -38,6 +41,7 @@ namespace Notepad
             {
                 var file = new TextFile("Sans Titre 1");
                 var rtb = new CustomRichTextBox();
+                
                 MainTabControl.TabPages.Add(file.SafeFileName);
                 var tabPages = MainTabControl.TabPages[0];
                 tabPages.Controls.Add(rtb);

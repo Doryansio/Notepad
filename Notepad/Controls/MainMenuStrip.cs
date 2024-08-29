@@ -7,6 +7,10 @@ using System.Windows.Forms;
 
 namespace Notepad.Controls
 {
+
+    /// <summary>
+    /// Classe herité de MenuStrip de Windows Forms
+    /// </summary>
     class MainMenuStrip : MenuStrip
     {
         private const string NAME = "MainMenuStrip";
@@ -15,6 +19,11 @@ namespace Notepad.Controls
         private MainForm _form;
         private OpenFileDialog _openFileDialog;
         private SaveFileDialog _saveFileDialog;
+         
+        
+        /// <summary>
+        /// Constructeur de la Classe MainMenuStrip
+        /// </summary>
         public MainMenuStrip()
         {
 
@@ -36,18 +45,25 @@ namespace Notepad.Controls
             };
 
         }
+
+        /// <summary>
+        /// Menu deroulant de la partie "Fichier" du ToolStripMenuItem
+        /// </summary>
         public void FileDropDownMenu()
         {
-            // instanciation de la classe systeme ToolStripMenuItem avec le nom FileDropDownMenu. Utilisation du kw var possible.
-
+            
+            //Instanciation de la classe FileDropMenu
             var FileDropDownMenu = new ToolStripMenuItem("Fichier");
 
             var NewMenu = new ToolStripMenuItem("Nouveau", null, null, Keys.Control | Keys.N);
             var OpenMenu = new ToolStripMenuItem("Ouvrir...", null, null, Keys.Control | Keys.O);
             var SaveMenu = new ToolStripMenuItem("Enregistrer", null, null, Keys.Control | Keys.S);
             var SaveAsMenu = new ToolStripMenuItem("Enregistrer sous...", null, null, Keys.Control | Keys.Shift | Keys.S);
+            var Rename = new ToolStripMenuItem("Renommer..."); /// Renommer un fichier ?
             var QuitMenu = new ToolStripMenuItem("Quitter", null, null, Keys.Alt | Keys.F4);
 
+
+            // evenement permettant de creer un nouveau fichier texte.
             NewMenu.Click += (s, e) =>
             {
                 var tabControl = _form.MainTabControl;
@@ -56,6 +72,7 @@ namespace Notepad.Controls
                 var FileName = $"Sans filtre {tabCount + 1}";
                 var File = new TextFile(FileName);
                 var rtb = new CustomRichTextBox();
+                
 
                 tabControl.TabPages.Add(File.SafeFileName);
                 var newTabPages = tabControl.TabPages[tabCount];
@@ -69,6 +86,8 @@ namespace Notepad.Controls
                 _form.CurrentRtb = rtb;
             };
 
+
+            // event permettant d'ouvrir un fichier deja existant. Utilise la Classe privée OpenFileDialog pour acceder au fichier sur le disque.
             OpenMenu.Click += async (s, e) =>
             {
                 if(_openFileDialog.ShowDialog() == DialogResult.OK)
@@ -121,6 +140,7 @@ namespace Notepad.Controls
                 }
             };
 
+            // event permettant d'ouvrir un fichier deja existant. Utilise la Classe privée SaveFileDialog pour acceder au fichier sur le disque.
             SaveAsMenu.Click += async (s, e) =>
             {
                 if (_saveFileDialog.ShowDialog() == DialogResult.OK)
@@ -160,13 +180,15 @@ namespace Notepad.Controls
                 }
             };
 
+            
+
             QuitMenu.Click += (s, e) =>
             {
                 Application.Exit();
             };
 
             // Ajouter les items dans le ToolStripMenu sous forme de tableau grâce a AddRange.
-            FileDropDownMenu.DropDownItems.AddRange(new ToolStripItem[] { NewMenu, OpenMenu, SaveMenu, SaveAsMenu, QuitMenu });
+            FileDropDownMenu.DropDownItems.AddRange(new ToolStripItem[] { NewMenu, OpenMenu, SaveMenu, SaveAsMenu, Rename, QuitMenu });
 
             Items.Add(FileDropDownMenu);
         }
