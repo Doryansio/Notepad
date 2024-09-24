@@ -46,7 +46,7 @@ namespace Notepad.Controls
                     _form.CurrentFile = file;
                     _form.CurrentRtb.Clear();
 
-                    _form.MainTabControl.SelectedTab.Text= file.FileName;
+                    _form.MainTabControl.SelectedTab.Text = file.FileName;
                     _form.Session.TextFiles.Add(file);
                     _form.Text = "Sans Titre 1 - Notepad.NET";
                 }
@@ -59,16 +59,16 @@ namespace Notepad.Controls
                     TabPage selectedTab = _form.MainTabControl.SelectedTab;
 
                     // suppression des onglets qui ne correspondent pas a l'onglet selectionné
-                    foreach (TabPage tabPages in _form.MainTabControl.TabPages) 
+                    foreach (TabPage tabPages in _form.MainTabControl.TabPages)
                     {
-                        if(tabPages != selectedTab)
+                        if (tabPages != selectedTab)
                         {
                             _form.MainTabControl.TabPages.Remove(tabPages);
                         }
                     }
-                    foreach (var file in _form.Session.TextFiles) 
+                    foreach (var file in _form.Session.TextFiles)
                     {
-                        if(file != _form.CurrentFile)
+                        if (file != _form.CurrentFile)
                         {
                             fileToDelete.Add(file);
                         }

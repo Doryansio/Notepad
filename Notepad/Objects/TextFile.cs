@@ -22,14 +22,14 @@ namespace Notepad.Objects
         [XmlAttribute(AttributeName = "BackUpFileName")]
         public string BackUpFileName { get; set; } = string.Empty;
 
-
+        
         /// <summary>
         /// Nom et extension du fichier. Le nom du fichier n'inclut pas le chemin d'acces.
         /// </summary>
         [XmlIgnore()]
         public string SafeFileName { get; set; }
 
-
+        
         /// <summary>
         /// Nom et extension du fichier backup. Le nom du fichier n'inclut pas le chemin d'acces.
         /// </summary>
@@ -64,10 +64,10 @@ namespace Notepad.Objects
             FileName = fileName;
             SafeFileName = Path.GetFileName(fileName);
 
-            if(FileName.StartsWith("Sans Titre"))
+            if (FileName.StartsWith("Sans Titre"))
             {
-                SafeBackUpFileName = $"{FileName}@{DateTime.Now: dd -MM- yyyy-HH-mm-ss}";
-                BackUpFileName = Path.Combine(Session.BackupPath,SafeBackUpFileName);
+                SafeBackUpFileName = $"{FileName}@{DateTime.Now: dd-MM-yyyy-HH-mm-ss}";
+                BackUpFileName = Path.Combine(Session.BackupPath, SafeBackUpFileName);
             }
         }
     }

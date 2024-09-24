@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Drawing;
 using System.Windows.Forms;
 
 namespace Notepad.Controls
@@ -12,7 +6,7 @@ namespace Notepad.Controls
     public class CompteurLigne : Panel
     {
         private const string NAME = "ligneCompteur";
-        
+
 
         public CompteurLigne()
         {
@@ -20,9 +14,9 @@ namespace Notepad.Controls
             Dock = DockStyle.Left;
             Width = 40;
             BackColor = Color.Gray;
-            
-            
-            
+
+
+
         }
     }
 }

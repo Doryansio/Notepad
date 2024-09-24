@@ -23,13 +23,13 @@ namespace Notepad.Controls
             {
                 _form.CurrentFile = _form.Session.TextFiles[SelectedIndex];
                 _form.CurrentRtb = (CustomRichTextBox)_form.MainTabControl.TabPages[SelectedIndex].Controls.Find("RtbtextFilecontent", true).First();
-                _form.Text= $"{_form.CurrentFile.FileName} - NotePad.NET";
+                _form.Text = $"{_form.CurrentFile.SafeFileName} - NotePad.NET";
             };
-            MouseUp += (s, e) => 
+            MouseUp += (s, e) =>
             {
-                if (e.Button == MouseButtons.Right) 
+                if (e.Button == MouseButtons.Right)
                 {
-                    for (int i = 0; i < TabCount; i++) 
+                    for (int i = 0; i < TabCount; i++)
                     {
                         var rect = GetTabRect(i);
                         if (rect.Contains(e.Location))

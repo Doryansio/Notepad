@@ -1,9 +1,9 @@
 ﻿using Notepad.Controls;
 using Notepad.Objects;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+
 
 namespace Notepad
 {
@@ -17,13 +17,15 @@ namespace Notepad
 
         public MainForm()
         {
+            //Sert a initialiser le form doit se placer en premier dans la classe main form
             InitializeComponent();
             Session = new Session();
             var menuStrip = new MainMenuStrip();
             MainTabControl = new MainTabControl();
             CurrentRtb = new CustomRichTextBox();
             
-            
+
+
             Controls.AddRange(new Control[] { MainTabControl, menuStrip, });
 
             InitialiazeFile();
@@ -35,15 +37,16 @@ namespace Notepad
         private async void InitialiazeFile()
         {
             Session = await Session.Load();
-            
+
 
             if (Session.TextFiles.Count == 0)
             {
                 var file = new TextFile("Sans Titre 1");
-                var rtb = new CustomRichTextBox();
-                
+
+
                 MainTabControl.TabPages.Add(file.SafeFileName);
                 var tabPages = MainTabControl.TabPages[0];
+                var rtb = new CustomRichTextBox();
                 tabPages.Controls.Add(rtb);
                 rtb.Select();
 
@@ -59,7 +62,7 @@ namespace Notepad
 
                 foreach (var file in Session.TextFiles)
                 {
-                    if(File.Exists(file.FileName) || File.Exists(file.BackUpFileName))
+                    if (File.Exists(file.FileName) || File.Exists(file.BackUpFileName))
                     {
                         var rtb = new CustomRichTextBox();
                         var tabCount = MainTabControl.TabCount;
@@ -68,21 +71,23 @@ namespace Notepad
                         MainTabControl.TabPages[tabCount].Controls.Add(rtb);
 
                         rtb.Text = file.Content;
-                        
+
                     }
                 }
                 CurrentFile = Session.TextFiles[activeIndex];
                 MainTabControl.SelectedIndex = activeIndex;
                 CurrentRtb = (CustomRichTextBox)MainTabControl.TabPages[activeIndex].Controls.Find("RtbtextFilecontent", true).First();
-                
+
                 CurrentRtb.Select();
             }
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+
             Session.ActiveIndex = MainTabControl.SelectedIndex;
             Session.Save();
+            
 
             foreach (var file in Session.TextFiles)
             {
@@ -95,7 +100,7 @@ namespace Notepad
                     Session.BackupFile(file);
                 }
             }
-            
+
         }
     }
 }

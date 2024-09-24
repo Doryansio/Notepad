@@ -15,10 +15,10 @@ namespace Notepad.Controls
             Dock = DockStyle.Fill;
             BorderStyle = BorderStyle.None;
             ContextMenuStrip = new RichTextBoxContextMenuStrip(this);
-            LigneCompteur = new CompteurLigne();
-            
-            Controls.Add(LigneCompteur);
-            
+            //LigneCompteur = new CompteurLigne();
+
+            //Controls.Add(LigneCompteur);
+
         }
     }
 }

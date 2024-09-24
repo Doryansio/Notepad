@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
@@ -29,6 +28,8 @@ namespace Notepad.Objects
 
         [XmlAttribute(AttributeName = "ActiveIndex")]
         public int ActiveIndex { get; set; } = 0;
+
+
         [XmlElement(ElementName = "File")]
         public List<TextFile> TextFiles { get; set; }
 
@@ -86,10 +87,10 @@ namespace Notepad.Objects
                         }
                     }
                 }
-                catch (Exception ex) 
+                catch (Exception ex)
                 {
                     MessageBox.Show("Une erreur s'est produite" + ex.Message);
-                    
+
                 }
                 streamReader.Close();
             }
@@ -112,7 +113,7 @@ namespace Notepad.Objects
                 await Task.Run(() => Directory.CreateDirectory(BackupPath));
             }
 
-            if(file.FileName.StartsWith("Sans Titre"))
+            if (file.FileName.StartsWith("Sans Titre"))
             {
                 using (StreamWriter writer = File.CreateText(file.BackUpFileName))
                 {

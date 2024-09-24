@@ -1,18 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+﻿using System.Collections.Generic;
+
 
 namespace Notepad.Services
 {
     public static class ExtensionsMethods
     {
-        public static void Replace<T>(this List<T> list, T oldItem,  T newItem)
+        public static void Replace<T>(this List<T> list, T oldItem, T newItem)
         {
             var oldItemIndex = list.IndexOf(oldItem);
             list[oldItemIndex] = newItem;
         }
+
+        public static void Replace<String>(string oldString, string NewString)
+        {
+            NewString = string.Empty;
+            oldString = NewString;
+        }
+
     }
 }
