@@ -44,6 +44,8 @@ namespace Notepad.Objects
         [XmlIgnore()]
         public string Content { get; set; } = string.Empty;
 
+        
+
 
         /// <summary>
         /// Constructeur de la classe TextFile

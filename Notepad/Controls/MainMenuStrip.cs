@@ -7,6 +7,8 @@ using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using static Notepad.Controls.CustomRichTextBox;
+
 
 namespace Notepad.Controls
 {
@@ -17,12 +19,16 @@ namespace Notepad.Controls
     class MainMenuStrip : MenuStrip
     {
         private const string NAME = "MainMenuStrip";
-
+        public MainTabControl TabControl;
         private FontDialog _fontDialog;
         private MainForm _form;
         private OpenFileDialog _openFileDialog;
         private SaveFileDialog _saveFileDialog;
+        private SaveFileDialog _renameFileDialog;
         
+
+
+
 
 
         /// <summary>
@@ -30,7 +36,7 @@ namespace Notepad.Controls
         /// </summary>
         public MainMenuStrip()
         {
-
+            
             Name = NAME; // sert a identifier le menu pour y faire reference dans d'autre classe.
             Dock = DockStyle.Top;   // Sert a ancrer le control. Au top dans ce cas la.
 
@@ -38,7 +44,17 @@ namespace Notepad.Controls
             _openFileDialog = new OpenFileDialog()
             ;
             _saveFileDialog = new SaveFileDialog();
+
+            //instanciation de la classe SFD avec le titre renommer.
+            // + faire en sorte que lors de renommage du fichier l'ancien nom soit dans le dialog.
+            _renameFileDialog = new SaveFileDialog();
+            _renameFileDialog.Title = "Renommer";
             
+
+
+
+
+
 
             FileDropDownMenu();
             EditDropDownMenu();
@@ -133,11 +149,13 @@ namespace Notepad.Controls
                     {
                         using (StreamWriter writer = File.CreateText(currentFile.FileName))
                         {
-                            await writer.WriteAsync(currentFile.Content);
+                            await writer.WriteAsync(currentRtbText);
                         }
                         currentFile.Content = currentRtbText;
                         _form.Text = currentFile.FileName;
                         _form.MainTabControl.SelectedTab.Text = currentFile.SafeFileName;
+                        MessageBox.Show("sauvegarde faite");
+                        MessageBox.Show(currentRtbText);
                     }
                     else
                     {
@@ -151,6 +169,8 @@ namespace Notepad.Controls
             {
                 if (_saveFileDialog.ShowDialog() == DialogResult.OK)
                 {
+                    
+                    var currentFile = _form.CurrentFile.FileName;
                     var newFileName = _saveFileDialog.FileName;
                     var alreadyExists = false;
 
@@ -186,41 +206,41 @@ namespace Notepad.Controls
                 }
             };
 
-            
-            RenameMenu.Click += async (s, e) =>
+            /* Methode a refaire 
+             la modification du fichier enleve le Path dans le fihier session de %app data% et ne renome
+            pas le fichier dans dir NotePad 
+            + Voir pour que le boutton renommerne soit pas enable si le fichier n'est pas sur le disque*/
+
+            RenameMenu.Click +=  (s, e) =>
             {
-                
-                var OldFileName = _form.CurrentFile;
-
-                if (File.Exists(OldFileName.FileName))
+                if(_renameFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    string NewFileName = Interaction.InputBox("Renommer", "NotePad.NET", OldFileName.SafeFileName);
-                    var file = new TextFile(NewFileName) { Content = _form.CurrentRtb.Text };
-                    var oldFile = _form.Session.TextFiles.Where(x => x.FileName == _form.CurrentFile.FileName).First();
+                    var OldFileName = _form.CurrentFile;
+                    var RenamedFileName = _renameFileDialog.FileName;
+                    var alreadyExist = false;
 
-                    _form.Session.TextFiles.Replace(oldFile, file);
-
-                    using (StreamWriter writer = File.CreateText(file.FileName))
+                    foreach (var file in _form.Session.TextFiles)
                     {
-                        await writer.WriteAsync(file.Content);
+                        if(OldFileName.Equals(RenamedFileName))
+                        {
+                            MessageBox.Show("Veuillez renommer le fichier avec un nom different.", "ERROR", 
+                                MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            alreadyExist = true;
+                            break;
+                        }
+                    }
+                    {
+
                     }
 
-                    _form.MainTabControl.SelectedTab.Text = file.SafeFileName;
-                    _form.Text = file.FileName;
-                    _form.CurrentFile = file;
                     
                 }
-                else
-                {
-                    RenameMenu.Checked = false;
-                }
-
-                
             };
 
-            //Verification avant de fermer l'application pour enregister le fichier en cours
-            // si le fichier n'existe pas l'user est ammener a enregistrer sous
-            //sinon le fichier est sauvegardé
+            /* Methode a revoir
+             enregister le travail si le fichier existe deja 
+            et enregistrer sous si non 
+            actuellement dans le deux cas la savefilediaog s'ouvre*/
 
             QuitMenu.Click += (s, e) =>
             {
@@ -260,15 +280,47 @@ namespace Notepad.Controls
 
         public void EditDropDownMenu()
         {
+            var rtb = new CustomRichTextBox();
             var EditDropDown = new ToolStripMenuItem("Edition");
 
             var Cancel = new ToolStripMenuItem("Annuler", null, null, Keys.Control | Keys.Z);
             var Restore = new ToolStripMenuItem("Restaurer", null, null, Keys.Control | Keys.Y);
+            var Goto = new ToolStripMenuItem("Go to ...", null, null, Keys.Control | Keys.G);
 
             Cancel.Click += (s, e) => { if (_form.CurrentRtb.CanUndo) _form.CurrentRtb.Undo(); };
             Restore.Click += (s, e) => { if (_form.CurrentRtb.CanRedo) _form.CurrentRtb.Redo(); };
+            Goto.Click += (s, e) => 
+            {
+                
+                string input = Interaction.InputBox("Ligne n°", "Go to", "1");
+                try
+                {
+                    int line = Convert.ToInt32(input);
+                    if (line > _form.CurrentRtb.Lines.Length)
+                    {
+                        MessageBox.Show("le nombre total de ligne dans le fichier est de " + _form.CurrentRtb.Lines.Length, "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    else
+                    {
+                        string[] lines = _form.CurrentRtb.Lines;
+                        int len = 0;
+                        for (int i = 0; i < line - 1; i++)
+                        {
+                            len = len + lines[i].Length+1;
+                        }
+                        _form.CurrentRtb.Focus();
+                        _form.CurrentRtb.Select(len, 0);
+                    }
+                    
+                        
+                }catch (Exception ex)
+                {
+                    MessageBox.Show("Saisissez un nombre", "Entrée invalide", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            };
 
-            EditDropDown.DropDownItems.AddRange(new ToolStripItem[] { Cancel, Restore });
+
+            EditDropDown.DropDownItems.AddRange(new ToolStripItem[] { Cancel, Restore, Goto });
 
             Items.Add(EditDropDown);
         }

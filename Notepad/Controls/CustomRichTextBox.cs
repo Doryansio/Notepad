@@ -1,23 +1,32 @@
 ﻿using System.Drawing;
+using System.Web;
 using System.Windows.Forms;
 
 namespace Notepad.Controls
 {
-    public class CustomRichTextBox : RichTextBox
+    public class CustomRichTextBox : RichTextBox 
     {
         private const string NAME = "RtbtextFilecontent";
-        public CompteurLigne LigneCompteur;
+
         public CustomRichTextBox()
         {
+
             Name = NAME;
+
             AcceptsTab = true; //permet d'accepter la tabulation dans le rtbtxtfilecontent
             Font = new Font("Arial", 12.0F, FontStyle.Regular);
             Dock = DockStyle.Fill;
             BorderStyle = BorderStyle.None;
             ContextMenuStrip = new RichTextBoxContextMenuStrip(this);
-            //LigneCompteur = new CompteurLigne();
+            
+            
 
-            //Controls.Add(LigneCompteur);
+        }
+        public new string[] Lines
+        {
+            get { return base.Lines; }
+
+            set { base.Lines = value; }
 
         }
     }
